@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF8C00">
+  <title>אנגליתוש — THE DODOS</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="quiz-page">
+    <div class="quiz-container">
+
+      <!-- ── Top Bar ── -->
+      <div class="quiz-top">
+        <div class="quiz-top-left">
+          <button class="quiz-back" id="btn-back">→</button>
+          <span class="quiz-page-title" style="font-family:'Fredoka',sans-serif">אנגליתוש</span>
+        </div>
+        <div class="quiz-stats">
+          ✓ <span id="session-correct">0</span> / <span id="session-total">0</span>
+        </div>
+      </div>
+
+      <!-- ── Home View ── -->
+      <div id="home-view">
+        <div class="lb-card">
+          <div class="lb-title">🏆 טבלת מובילים</div>
+          <div id="leaderboard"></div>
+        </div>
+
+        <div style="text-align:center;color:rgba(255,255,255,0.7);font-size:14px;margin-bottom:8px;">
+          <span id="player-name"></span> ,היי
+        </div>
+
+        <button class="btn-start-quiz" id="btn-start">!Let's Go 🚀</button>
+        <div id="status-msg"></div>
+      </div>
+
+      <!-- ── Quiz View ── -->
+      <div id="quiz-view">
+        <div class="q-card" id="question-area">
+          <div class="q-text" id="q-text" dir="ltr" style="text-align:left;font-family:'Fredoka',sans-serif"></div>
+        </div>
+
+        <div class="opts" id="options-area"></div>
+
+        <div id="feedback-area"></div>
+
+        <button class="btn-next-q" id="btn-next-q">Next Question →</button>
+        <button class="btn-stop" id="btn-stop">חזרה לדשבורד</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="confetti-container"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/english.js"></script>
+</body>
+</html>

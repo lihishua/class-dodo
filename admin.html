@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF8C00">
+  <title>ממשק מנהל — THE DODOS</title>
+  <link rel="icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="admin-page">
+    <div class="admin-container">
+
+      <!-- ── Header ── -->
+      <div class="admin-header">
+        <h1>⚙️ ממשק מנהל</h1>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:13px;color:var(--text-light)">שלום, <span id="admin-name"></span></span>
+          <button class="btn-icon" id="btn-back" title="חזרה">🏠</button>
+          <button class="btn-icon" id="btn-logout" title="התנתק">🚪</button>
+        </div>
+      </div>
+
+      <!-- ── Tabs ── -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-section="sec-users">👥 משתמשים</button>
+        <button class="admin-tab" data-section="sec-math">🔢 חשבוניאדה</button>
+        <button class="admin-tab" data-section="sec-english">🔤 אנגליתוש</button>
+        <button class="admin-tab" data-section="sec-events">📅 אירועים</button>
+        <button class="admin-tab" data-section="sec-summary">📋 סיכום שבועי</button>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION: USERS
+           ═══════════════════════════════════════════════════════ -->
+      <div id="sec-users" class="admin-section active">
+        <div class="admin-form-card">
+          <h3>👥 משתמשים רשומים</h3>
+          <div id="users-list"></div>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn-reset-lb" id="btn-reset-math-lb">🔄 אפס לידרבורד חשבון</button>
+          <button class="btn-reset-lb" id="btn-reset-eng-lb">🔄 אפס לידרבורד אנגלית</button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION: MATH QUESTIONS
+           ═══════════════════════════════════════════════════════ -->
+      <div id="sec-math" class="admin-section">
+
+        <!-- Add question form -->
+        <div class="admin-form-card">
+          <h3>➕ הוסף תרגיל חשבון</h3>
+          <form id="math-form">
+            <div class="form-group-sm">
+              <label>שאלה</label>
+              <input type="text" id="math-q" placeholder="?כמה זה 25 × 4" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>תשובה א׳</label>
+                <input type="text" id="math-a" required>
+              </div>
+              <div class="form-group-sm">
+                <label>תשובה ב׳</label>
+                <input type="text" id="math-b" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>תשובה ג׳</label>
+                <input type="text" id="math-c" required>
+              </div>
+              <div class="form-group-sm">
+                <label>תשובה ד׳</label>
+                <input type="text" id="math-d" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>תשובה נכונה</label>
+                <select id="math-correct">
+                  <option value="0">א׳</option>
+                  <option value="1">ב׳</option>
+                  <option value="2">ג׳</option>
+                  <option value="3">ד׳</option>
+                </select>
+              </div>
+              <div class="form-group-sm">
+                <label>רמת קושי</label>
+                <select id="math-difficulty">
+                  <option value="1">קל</option>
+                  <option value="2" selected>בינוני</option>
+                  <option value="3">קשה</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group-sm">
+              <label>הסבר (אופציונלי)</label>
+              <textarea id="math-explain" placeholder="הסבר קצר לתשובה הנכונה"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">הוסף תרגיל</button>
+          </form>
+        </div>
+
+        <!-- Existing questions -->
+        <div class="admin-form-card">
+          <h3>📝 תרגילים קיימים <span id="math-count" style="font-weight:400;font-size:13px;color:var(--text-light)"></span></h3>
+          <div id="math-list"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION: ENGLISH QUESTIONS
+           ═══════════════════════════════════════════════════════ -->
+      <div id="sec-english" class="admin-section">
+
+        <div class="admin-form-card">
+          <h3>➕ הוסף תרגיל אנגלית</h3>
+          <form id="english-form">
+            <div class="form-group-sm">
+              <label>Question</label>
+              <input type="text" id="eng-q" placeholder="Choose the correct word: She ___ to school every day." dir="ltr" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>Option A</label>
+                <input type="text" id="eng-a" dir="ltr" required>
+              </div>
+              <div class="form-group-sm">
+                <label>Option B</label>
+                <input type="text" id="eng-b" dir="ltr" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>Option C</label>
+                <input type="text" id="eng-c" dir="ltr" required>
+              </div>
+              <div class="form-group-sm">
+                <label>Option D</label>
+                <input type="text" id="eng-d" dir="ltr" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>תשובה נכונה</label>
+                <select id="eng-correct">
+                  <option value="0">A</option>
+                  <option value="1">B</option>
+                  <option value="2">C</option>
+                  <option value="3">D</option>
+                </select>
+              </div>
+              <div class="form-group-sm">
+                <label>נושא</label>
+                <input type="text" id="eng-topic" placeholder="Grammar / Vocabulary / Reading" dir="ltr">
+              </div>
+            </div>
+            <div class="form-group-sm">
+              <label>הסבר (אופציונלי)</label>
+              <textarea id="eng-explain" placeholder="Quick explanation of the correct answer" dir="ltr"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">הוסף תרגיל</button>
+          </form>
+        </div>
+
+        <div class="admin-form-card">
+          <h3>📝 תרגילים קיימים <span id="english-count" style="font-weight:400;font-size:13px;color:var(--text-light)"></span></h3>
+          <div id="english-list"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION: EVENTS
+           ═══════════════════════════════════════════════════════ -->
+      <div id="sec-events" class="admin-section">
+
+        <div class="admin-form-card">
+          <h3>➕ הוסף אירוע</h3>
+          <form id="event-form">
+            <div class="form-row">
+              <div class="form-group-sm">
+                <label>תאריך</label>
+                <input type="date" id="event-date" required>
+              </div>
+              <div class="form-group-sm">
+                <label>כותרת</label>
+                <input type="text" id="event-title" placeholder="מבחן מתמטיקה" required>
+              </div>
+            </div>
+            <button type="submit" class="btn-submit">הוסף</button>
+          </form>
+        </div>
+
+        <div class="admin-form-card">
+          <h3>📅 אירועים</h3>
+          <div id="events-list"></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SECTION: WEEKLY SUMMARY
+           ═══════════════════════════════════════════════════════ -->
+      <div id="sec-summary" class="admin-section">
+
+        <div class="admin-form-card">
+          <h3>📤 העלה סיכום שבועי</h3>
+          <form id="summary-form">
+            <div class="form-group-sm">
+              <label>כותרת</label>
+              <input type="text" id="summary-title" placeholder="סיכום שבועי — שבוע 12">
+            </div>
+            <div class="form-group-sm">
+              <label>קובץ (PDF / תמונה)</label>
+              <input type="file" id="summary-file" accept=".pdf,.jpg,.jpeg,.png,.gif,.webp" required>
+            </div>
+            <button type="submit" class="btn-submit">העלאה</button>
+          </form>
+        </div>
+
+        <div class="admin-form-card">
+          <h3>📋 סיכומים קודמים</h3>
+          <div id="summaries-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
