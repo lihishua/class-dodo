@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#FF8C00">
-  <title>THE DODOS</title>
+  <title>CLASS DODO</title>
   <link rel="icon" href="assets/favicon.ico">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css">
@@ -14,67 +14,49 @@
   <div class="dashboard">
 
     <!-- ── Top Bar ── -->
-    <div class="top-bar">
-      <div class="top-bar-left">
-        <span class="top-bar-logo">THE DODOS</span>
+    <!-- RTL: first child → right, last child → left -->
+    <header class="top-bar">
+      <div class="top-end">
+        <img src="assets/account.png" alt="התנתק" class="account-icon" id="btn-logout" title="התנתק">
+        <img src="assets/header2 section.png" alt="הכיתה של אושרה ודורית" class="class-badge-img">
       </div>
-      <div class="top-bar-right">
-        <span class="class-badge">→ הכיתה של אושרה ודורית</span>
-        <button class="btn-icon" id="btn-logout" title="התנתק">🚪</button>
-      </div>
-    </div>
+      <div class="logo-pill">CLASS DODO</div>
+    </header>
 
-    <!-- ── Greeting ── -->
-    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
-      <img src="assets/dodo-logo.png" alt="Dodo" style="width:100px;height:auto;">
-      <div>
-        <h1 id="user-greeting" style="font-size:22px;font-weight:700;color:var(--white)"></h1>
-      </div>
-    </div>
-
-    <!-- ── Main Grid ── -->
-    <div class="dash-grid">
-
-      <!-- חשבוניאדה -->
-      <a href="math.html" class="dash-card featured">
-        <div class="card-icon">
-          <img src="assets/icon-math.png" alt="חשבוניאדה">
+      <!-- Col 1 (rightmost in RTL): Dodo + English -->
+      <div class="col-left">
+        <div class="dodo-card">
+          <img src="assets/dodo-logo.png" alt="CLASS DODO" class="dodo-img">
         </div>
-        <div class="card-title">חשבוניאדה</div>
-      </a>
+        <a href="english.html" class="english-card"></a>
+      </div>
 
-      <!-- אנגליתוש -->
-      <a href="english.html" class="dash-card">
-        <div class="card-icon">
-          <img src="assets/icon-english.png" alt="אנגליתוש">
-        </div>
-        <div class="card-title english">אנגליתוש</div>
-      </a>
+      <!-- Col 2 (middle): Math + Summary -->
+      <div class="col-mid">
+        <a href="math.html" class="math-card"></a>
+        <div class="folder-card" id="btn-summary"></div>
+      </div>
 
-      <!-- מה קורה מתי? -->
-      <div class="events-card">
-        <div class="events-header">
-          <div class="events-title">
-            📅 ?מה קורה מתי
+      <!-- Col 3 (leftmost in RTL): Events + Hall of Fame -->
+      <div class="col-right">
+        <div class="events-card">
+          <div class="events-header">
+            <img src="assets/calendar section.png" alt="מה קורה מתי?" class="events-header-img">
+          </div>
+          <div id="events-list">
+            <p class="empty-state">...טוען</p>
           </div>
         </div>
-        <div id="events-list">
-          <p class="empty-state">...טוען</p>
+
+        <div class="hof-card">
+          <div id="hof-list" class="hof-list">
+            <p class="hof-empty">...טוען</p>
+          </div>
         </div>
       </div>
 
-      <!-- סיכום שבועי -->
-      <div class="summary-card" id="btn-summary" style="grid-column: 1 / -1;">
-        <img src="assets/icon-summary.png" alt="סיכום" class="summary-icon">
-        <div class="summary-text">סיכום שבועי</div>
-      </div>
-
-    </div>
-
-    <!-- Admin Link -->
-    <a href="admin.html" class="admin-link" id="admin-link">
-      ⚙️ ממשק מנהל
-    </a>
+    <!-- Admin Link (hidden by default) -->
+    <a href="admin.html" class="admin-link" id="admin-link">⚙️ ממשק מנהל</a>
 
   </div>
 

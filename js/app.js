@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// THE DODOS — Dashboard App
+// CLASS DODO — Dashboard App
 // ═══════════════════════════════════════════════════════════════
 
 let currentUser = null;
@@ -12,29 +12,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = result.user;
   currentProfile = result.profile;
 
-  // Set greeting
-  document.getElementById("user-greeting").textContent =
-    `!${currentProfile.displayName || "דודו"} ,היי`;
-
   // Show admin button if admin
   if (currentProfile.role === "admin") {
     document.getElementById("admin-link").style.display = "flex";
   }
 
-  // Load events
   loadEvents();
-
-  // Load weekly summary
   loadWeeklySummary();
+  loadHallOfFame();
 
-  // Logout
   document.getElementById("btn-logout").addEventListener("click", async () => {
     await auth.signOut();
     window.location.href = "index.html";
   });
 });
 
-// ─── Load Events ("מה קורה מתי?") ───────────────────────────
+// ─── Load Events ─────────────────────────────────────────────
 async function loadEvents() {
   const container = document.getElementById("events-list");
   try {
@@ -65,31 +58,54 @@ async function loadEvents() {
   }
 }
 
-// ─── Load Weekly Summary ────────────────────────────────────
+// ─── Load Weekly Summary ─────────────────────────────────────
 async function loadWeeklySummary() {
-  const container = document.getElementById("summary-area");
   const btn = document.getElementById("btn-summary");
   try {
     const snap = await db.collection("summaries")
       .orderBy("createdAt", "desc")
       .limit(1)
       .get();
+    if (snap.empty) return;
+    const summary = snap.docs[0].data();
+    btn.addEventListener("click", () => {
+      if (summary.fileUrl) window.open(summary.fileUrl, "_blank");
+    });
+  } catch (_) {}
+}
 
-    if (snap.empty) {
-      btn.disabled = true;
-      btn.textContent = "אין סיכום עדיין";
+// ─── Load Hall of Fame ────────────────────────────────────────
+async function loadHallOfFame() {
+  const container = document.getElementById("hof-list");
+  try {
+    const snap = await db.collection("users")
+      .where("role", "in", ["student", "pending_admin"])
+      .get();
+
+    const users = [];
+    snap.forEach(doc => {
+      const u = doc.data();
+      const score = (u.mathCorrect || 0) + (u.englishCorrect || 0);
+      if (score > 0) users.push({ name: u.displayName, score });
+    });
+
+    users.sort((a, b) => b.score - a.score);
+
+    if (users.length === 0) {
+      container.innerHTML = '<p class="hof-empty">...עוד אין מובילים</p>';
       return;
     }
 
-    const summary = snap.docs[0].data();
-    btn.addEventListener("click", () => {
-      if (summary.fileUrl) {
-        window.open(summary.fileUrl, "_blank");
-      }
+    const rankLabels = ["מקום ראשון", "מקום שני", "מקום שלישי"];
+    container.innerHTML = "";
+    users.slice(0, 3).forEach((u, i) => {
+      const div = document.createElement("div");
+      div.className = "hof-row";
+      div.textContent = `${rankLabels[i]} — ${u.name}`;
+      container.appendChild(div);
     });
   } catch (err) {
-    btn.disabled = true;
-    btn.textContent = "שגיאה בטעינה";
+    container.innerHTML = '<p class="hof-empty">שגיאה בטעינה</p>';
   }
 }
 

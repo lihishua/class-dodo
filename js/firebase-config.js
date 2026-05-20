@@ -4,6 +4,9 @@
 // Fill in your Firebase project credentials below.
 // Get them from: https://console.firebase.google.com → Project Settings → Web App
 
+const ANTHROPIC_KEY = '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';
+const ADMIN_CODE = 'dodo2026'; // change this to whatever code you give your teachers
+
 const firebaseConfig = {
   apiKey: "AIzaSyDAgO7ir8mZLsCZSbB4Iw6z30yt3xJ190M",
   authDomain: "class-dodo-4f249.firebaseapp.com",

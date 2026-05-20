@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#FF8C00">
-  <title>THE DODOS — כניסה</title>
+  <title>CLASS DODO — כניסה</title>
   <link rel="icon" href="assets/favicon.ico">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="css/styles.css">
@@ -16,7 +16,7 @@
       <div class="auth-logo">
         <img src="assets/dodo-logo.png" alt="The Dodos">
       </div>
-      <h1 class="auth-title">THE DODOS</h1>
+      <h1 class="auth-title">CLASS DODO</h1>
       <p class="auth-subtitle">הכיתה של אושרה ודורית</p>
 
       <div class="auth-tabs">
@@ -29,15 +29,14 @@
         <div id="login-error" class="auth-error"></div>
         <div id="login-success" class="auth-success"></div>
         <div class="form-group">
-          <label>אימייל</label>
-          <input type="email" id="login-email" required placeholder="your@email.com" dir="ltr">
+          <label>שם משתמש</label>
+          <input type="text" id="login-username" required placeholder="lennyshua" autocomplete="username" autocapitalize="none">
         </div>
         <div class="form-group">
           <label>סיסמה</label>
           <input type="password" id="login-password" required placeholder="••••••">
         </div>
         <button type="submit" class="btn-primary">כניסה</button>
-        <a id="forgot-password" class="forgot-link">שכחתי סיסמה</a>
       </form>
 
       <!-- REGISTER FORM -->
@@ -45,12 +44,12 @@
         <div id="register-error" class="auth-error"></div>
         <div id="register-success" class="auth-success"></div>
         <div class="form-group">
-          <label>שם תצוגה (השם שיופיע בטבלה)</label>
-          <input type="text" id="reg-name" required placeholder="למשל: יוסי כ.">
+          <label>כינוי (השם שיופיע באפליקציה. אפשר בעברית)</label>
+          <input type="text" id="reg-name" required placeholder="למשל: ליהי">
         </div>
         <div class="form-group">
-          <label>אימייל</label>
-          <input type="email" id="reg-email" required placeholder="your@email.com" dir="ltr">
+          <label>שם משתמש</label>
+          <input type="text" id="reg-username" required placeholder="idoshua" autocomplete="username" autocapitalize="none">
         </div>
         <div class="form-group">
           <label>סיסמה</label>
@@ -62,7 +61,11 @@
         </div>
         <div class="checkbox-group">
           <input type="checkbox" id="reg-admin">
-          <label for="reg-admin">אני מורה / מנהל/ת (דורש אישור)</label>
+          <label for="reg-admin">אני מורה / מנהל</label>
+        </div>
+        <div class="form-group" id="admin-code-group" style="display:none">
+          <label>קוד מורה</label>
+          <input type="text" id="reg-admin-code" placeholder="הכנס את הקוד שקיבלת" autocomplete="off" autocapitalize="none">
         </div>
         <button type="submit" class="btn-primary">הרשמה</button>
       </form>
