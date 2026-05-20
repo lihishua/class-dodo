@@ -1,0 +1,6 @@
+# Secret keys — never commit these
+js/api-keys.js
+
+# macOS
+.DS_Store
+assets/.DS_Store

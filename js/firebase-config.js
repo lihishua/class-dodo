@@ -4,7 +4,7 @@
 // Fill in your Firebase project credentials below.
 // Get them from: https://console.firebase.google.com → Project Settings → Web App
 
-const ANTHROPIC_KEY = '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';
+// ANTHROPIC_KEY is loaded from js/api-keys.js (gitignored — not in repo)
 const ADMIN_CODE = 'dodo2026'; // change this to whatever code you give your teachers
 
 const firebaseConfig = {
