@@ -27,10 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function loadEvents() {
   const container = document.getElementById("events-list");
   try {
+    const today = new Date().toISOString().split("T")[0];
     const snap = await db.collection("events")
-      .where("date", ">=", new Date().toISOString().split("T")[0])
       .orderBy("date", "asc")
-      .limit(10)
       .get();
 
     if (snap.empty) {
@@ -39,8 +38,12 @@ async function loadEvents() {
     }
 
     container.innerHTML = "";
+    let shown = 0;
     snap.forEach(doc => {
+      if (shown >= 10) return;
       const ev = doc.data();
+      if (ev.date < today) return; // skip past events client-side
+      shown++;
       const div = document.createElement("div");
       div.className = "event-item";
       div.innerHTML = `
@@ -49,7 +52,9 @@ async function loadEvents() {
       `;
       container.appendChild(div);
     });
+    if (shown === 0) container.innerHTML = '<p class="empty-state">אין אירועים קרובים 🎉</p>';
   } catch (err) {
+    console.error("loadEvents error:", err);
     container.innerHTML = '<p class="empty-state">לא הצלחתי לטעון אירועים</p>';
   }
 }

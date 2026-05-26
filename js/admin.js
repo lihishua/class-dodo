@@ -213,10 +213,9 @@ async function loadEventsPreview() {
   const container = document.getElementById("events-preview");
   try {
     const snap = await db.collection("events")
-      .where("date", ">=", new Date().toISOString().split("T")[0])
       .orderBy("date", "asc")
-      .limit(5).get();
-    if (snap.empty) { container.innerHTML = '<p class="empty-state">לחץ להוספת אירועים</p>'; return; }
+      .get();
+    if (snap.empty) { container.innerHTML = '<p class="empty-state">אין אירועים עדיין</p>'; return; }
     container.innerHTML = "";
     snap.forEach(doc => {
       const ev = doc.data();
@@ -225,7 +224,10 @@ async function loadEventsPreview() {
       div.innerHTML = `<span class="event-date">${formatDate(ev.date)}</span><span class="event-text">${ev.title}</span>`;
       container.appendChild(div);
     });
-  } catch (err) { container.innerHTML = '<p class="empty-state">שגיאה</p>'; }
+  } catch (err) {
+    console.error("loadEventsPreview error:", err);
+    container.innerHTML = '<p class="empty-state">שגיאה בטעינת אירועים</p>';
+  }
 }
 
 // ─── Hall of Fame ─────────────────────────────────────────────
