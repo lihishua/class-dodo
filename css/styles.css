@@ -1662,7 +1662,7 @@ a { color: inherit; text-decoration: none; }
   display: none;
   position: absolute;
   top: calc(100% + 10px);
-  left: 0;
+  right: 0;
   min-width: 180px;
   background: #fff;
   border-radius: 16px;
