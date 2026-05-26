@@ -8,52 +8,47 @@ let generatedResult = null;  // full AI result {type, questions/events/...}
 let selectedFile = null;
 
 // ─── AI Prompts ───────────────────────────────────────────────
-function buildPrompt() {
+
+// Call 1: classify the content and extract events/summary immediately,
+// or return just the topic list for math/english (no questions yet).
+function buildClassifyPrompt() {
   const year = new Date().getFullYear();
-  return `You are an AI assistant for a Hebrew 4th-grade classroom app called CLASSQUAD.
+  return `You are a classifier for a Hebrew 4th-grade classroom app.
 
-Analyze the provided content and classify it, then generate the appropriate output.
+Analyze the content and return ONE of these JSON structures — nothing else.
 
-Classification rules:
-- "math": math topics, exercises, arithmetic, exam prep → generate 100 Hebrew multiple-choice questions
-- "english": English language exercises, vocabulary, grammar → generate 100 English multiple-choice questions
-- "events": dates, trips, tests, celebrations, schedule items → extract as event list
-- "summary": weekly class newsletter, general notes → format as summary
-
-Return ONLY valid JSON. No text before or after.
-
-For math (Hebrew, 4th grade, age 9-10):
-{"type":"math","topics":["נושא"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
-
-For english (EFL, Israeli 4th graders):
-{"type":"english","topics":["Topic"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"Grammar"}]}
-
-For events (use year ${year} if not specified in content):
+EVENTS (dates, test dates, trips, deadlines, any calendar item):
 {"type":"events","events":[{"title":"...","date":"YYYY-MM-DD"}]}
+Use year ${year} when no year is given. Extract ALL dates found.
 
-For summary:
+SUMMARY (weekly newsletter, class update, general notes):
 {"type":"summary","title":"...","content":"..."}
 
-Math/English rules:
-- Exactly 100 questions, 4 options each, exactly 1 correct (index 0-3)
-- Plausible but clearly wrong distractors
-- Varied difficulty: ~30 easy (1), ~40 medium (2), ~30 hard (3)
-- Brief explanations in same language as questions`;
+MATH (worksheets, exercises, arithmetic problems to practice):
+{"type":"math","topics":["topic1","topic2"]}
+List the specific math topics — do NOT generate questions yet.
+
+ENGLISH (vocabulary lists, grammar exercises, reading comprehension):
+{"type":"english","topics":["topic1","topic2"]}
+List the specific English topics — do NOT generate questions yet.
+
+Return ONLY valid JSON. No explanation, no markdown.`;
 }
 
-function buildContinuationPrompt(type, topics) {
+// Call 2 / 3: generate one batch of 100 questions for a given type + topics.
+function buildQuestionsPrompt(type, topics, batch) {
   const topicList = topics.join(", ");
+  const noRepeat  = batch === 2 ? "Do NOT repeat any question from the first batch. " : "";
   if (type === "math") {
-    return `Generate 100 more unique Hebrew 4th-grade math questions on: ${topicList}.
-Do NOT repeat any question from the previous batch. Same JSON format:
-{"type":"math","topics":["נושא"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
-Return ONLY valid JSON. Exactly 100 questions. ~30 easy (1), ~40 medium (2), ~30 hard (3).`;
-  } else {
-    return `Generate 100 more unique English questions for Israeli 4th-grade EFL students on: ${topicList}.
-Do NOT repeat any question from the previous batch. Same JSON format:
-{"type":"english","topics":["Topic"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"Grammar"}]}
-Return ONLY valid JSON. Exactly 100 questions.`;
+    return `Generate 100 unique Hebrew 4th-grade math questions on: ${topicList}.
+${noRepeat}Return ONLY valid JSON:
+{"type":"math","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
+Exactly 100 questions. ~30 easy (1), ~40 medium (2), ~30 hard (3). Plausible but clearly wrong distractors.`;
   }
+  return `Generate 100 unique English questions for Israeli 4th-grade EFL students on: ${topicList}.
+${noRepeat}Return ONLY valid JSON:
+{"type":"english","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"..."}]}
+Exactly 100 questions.`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -516,25 +511,40 @@ async function saveResult(result) {
 
 // ─── Anthropic API ────────────────────────────────────────────
 async function callAnthropicAI(fileData, textContent) {
-  const userContent = buildUserContent(fileData, textContent);
-  userContent.push({ type: "text", text: buildPrompt() });
+  const contentParts = buildUserContent(fileData, textContent);
 
-  updateProcessingHint("מזהה סוג ויוצר תוכן...");
-  const result1 = await makeAnthropicCall(userContent);
+  // Step 1: classify + extract (events/summary done here; math/english returns topics only)
+  updateProcessingHint("מנתח את התוכן...");
+  const classified = await makeAnthropicCall(
+    [...contentParts, { type: "text", text: buildClassifyPrompt() }],
+    1000
+  );
 
-  if (result1.type !== "math" && result1.type !== "english") {
-    return result1;
+  // Events and summaries are fully handled by the classify call
+  if (classified.type === "events" || classified.type === "summary") {
+    return classified;
   }
 
-  // Second call: 100 more questions on the same topics
-  updateProcessingHint(`נושאים: ${result1.topics.join(", ")} — יוצר שאלות נוספות (101–200)...`);
-  const result2 = await makeAnthropicCall([
-    { type: "text", text: buildContinuationPrompt(result1.type, result1.topics) }
-  ]);
+  const { type, topics } = classified;
+
+  // Step 2: first 100 questions
+  updateProcessingHint(`זוהה: ${type === "math" ? "חשבון" : "אנגלית"} | נושאים: ${topics.join(", ")} — יוצר שאלות 1–100...`);
+  const q1 = await makeAnthropicCall(
+    [{ type: "text", text: buildQuestionsPrompt(type, topics, 1) }],
+    8192
+  );
+
+  // Step 3: second 100 questions
+  updateProcessingHint("יוצר שאלות 101–200...");
+  const q2 = await makeAnthropicCall(
+    [{ type: "text", text: buildQuestionsPrompt(type, topics, 2) }],
+    8192
+  );
 
   return {
-    ...result1,
-    questions: [...result1.questions, ...(result2.questions || [])],
+    type,
+    topics,
+    questions: [...(q1.questions || []), ...(q2.questions || [])],
   };
 }
 
@@ -551,7 +561,7 @@ function buildUserContent(fileData, textContent) {
   return content;
 }
 
-async function makeAnthropicCall(userContent) {
+async function makeAnthropicCall(userContent, maxTokens = 8192) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -562,7 +572,7 @@ async function makeAnthropicCall(userContent) {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 8192,
+      max_tokens: maxTokens,
       messages: [{ role: "user", content: userContent }],
     }),
   });
