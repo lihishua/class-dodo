@@ -74,11 +74,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("btn-upload").addEventListener("click", openAIModal);
 
-  document.getElementById("btn-open-events").addEventListener("click", () => {
-    openPanel("modal-events");
-    loadEvents();
-  });
-
   document.getElementById("btn-reset-lb").addEventListener("click", async () => {
     if (!confirm("לאפס את כל הלידרבורדים? (חשבון ואנגלית יחד)")) return;
     await resetLeaderboard("math");

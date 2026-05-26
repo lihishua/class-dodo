@@ -642,8 +642,9 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: baseline;
   gap: 6px;
-  padding: 9px 0;
-  font-size: 16px;
+  padding: 7px 0;
+  font-family: 'Motek', sans-serif;
+  font-size: 14px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -651,25 +652,26 @@ a { color: inherit; text-decoration: none; }
 
 .event-item::before {
   content: '•';
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1;
   color: var(--text-dark);
   flex-shrink: 0;
 }
 
 .event-date {
-  font-weight: 700;
+  font-family: 'Motek', sans-serif;
+  font-size: 14px;
   color: var(--text-dark);
 }
 
 .event-date::after {
   content: ' —';
-  font-weight: 400;
   color: var(--text-mid);
 }
 
 .event-text {
-  font-weight: 500;
+  font-family: 'Motek', sans-serif;
+  font-size: 14px;
   color: var(--text-dark);
 }
 
@@ -1260,12 +1262,6 @@ a { color: inherit; text-decoration: none; }
 .upload-card:active { transform: scale(0.98); }
 
 /* Events card — clickable in admin */
-.admin-events-card {
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-}
-.admin-events-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-.admin-events-card:active { transform: scale(0.99); }
 
 /* Bottom links row — spans all columns, row 3 in admin grid */
 .admin-bottom-links {
