@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF8C00">
+  <title>הכיתה שלי — CLASSQUAD</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="profile-page">
+
+    <header class="profile-header">
+      <button class="btn-back-profile" id="btn-back">← חזרה</button>
+      <div class="profile-header-info">
+        <div class="class-name-row">
+          <span class="profile-page-name" id="class-page-name"></span>
+          <button class="btn-rename-inline" id="btn-rename">✏️</button>
+        </div>
+        <div class="profile-stats" id="class-meta"></div>
+      </div>
+    </header>
+
+    <!-- Rename bar (hidden by default) -->
+    <div class="rename-bar" id="rename-bar" hidden>
+      <input type="text" id="rename-input" class="rename-input" placeholder="שם חדש לכיתה">
+      <button class="btn-rename-save" id="btn-rename-save">שמור</button>
+      <button class="btn-rename-cancel" id="btn-rename-cancel">ביטול</button>
+    </div>
+
+    <div class="profile-content" id="class-students">
+      <p class="profile-loading">...טוען תלמידים</p>
+    </div>
+
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/class.js"></script>
+</body>
+</html>

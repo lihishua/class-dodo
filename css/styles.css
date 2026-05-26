@@ -1923,3 +1923,165 @@ a { color: inherit; text-decoration: none; }
   color: #795548;
   line-height: 1.5;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CLASS MANAGEMENT PAGE (class.html)
+   ═══════════════════════════════════════════════════════════════ */
+
+.class-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-rename-inline {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.btn-rename-inline:hover { background: rgba(255,255,255,0.4); }
+
+.rename-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.rename-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.9);
+  font-size: 15px;
+  font-family: 'Rubik', sans-serif;
+  outline: none;
+}
+.rename-input:focus { border-color: #fff; }
+
+.btn-rename-save {
+  padding: 10px 18px;
+  background: #fff;
+  color: var(--orange);
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn-rename-cancel {
+  padding: 10px 14px;
+  background: transparent;
+  color: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Student card */
+.student-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+
+.student-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  flex-wrap: wrap;
+}
+
+.student-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-dark);
+  flex: 1;
+  min-width: 80px;
+}
+
+.student-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stat-math    { background: #bf3900; color: #fff; }
+.stat-english { background: #1565C0; color: #fff; }
+
+.btn-show-errors {
+  padding: 6px 14px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mid);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-show-errors:hover { background: #ececec; }
+
+/* Error cards inside a student */
+.student-errors {
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fafafa;
+}
+
+.no-errors {
+  font-size: 14px;
+  color: var(--text-light);
+  text-align: center;
+  padding: 8px 0;
+}
+
+.error-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border-right: 4px solid #FF3D00;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+
+.error-header { margin-bottom: 8px; }
+
+.error-question {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.error-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.error-opt {
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: #f7f7f7;
+  color: var(--text-mid);
+}
+.error-opt.opt-correct { background: #E8F5E9; color: #2E7D32; font-weight: 700; }
+.error-opt.opt-wrong   { background: #FFEBEE; color: #C62828; font-weight: 700; text-decoration: line-through; }

@@ -12,11 +12,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = result.user;
   currentProfile = result.profile;
 
-  // Show admin button if admin
-  if (currentProfile.role === "admin") {
-    document.getElementById("admin-link").style.display = "flex";
-  }
-
   loadEvents();
   loadWeeklySummary();
   loadHallOfFame();
@@ -33,8 +28,8 @@ async function loadEvents() {
   const container = document.getElementById("events-list");
   try {
     const snap = await db.collection("events")
-      .orderBy("date", "asc")
       .where("date", ">=", new Date().toISOString().split("T")[0])
+      .orderBy("date", "asc")
       .limit(10)
       .get();
 

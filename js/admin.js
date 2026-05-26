@@ -135,6 +135,7 @@ function setupPanels() {
       e.target.reset();
       showToast("!האירוע נוסף");
       loadEvents();
+      loadEventsPreview();
     } catch (err) { alert("שגיאה: " + err.message); }
   });
 
@@ -222,8 +223,8 @@ async function loadEventsPreview() {
   const container = document.getElementById("events-preview");
   try {
     const snap = await db.collection("events")
-      .orderBy("date", "asc")
       .where("date", ">=", new Date().toISOString().split("T")[0])
+      .orderBy("date", "asc")
       .limit(5).get();
     if (snap.empty) { container.innerHTML = '<p class="empty-state">לחץ להוספת אירועים</p>'; return; }
     container.innerHTML = "";
