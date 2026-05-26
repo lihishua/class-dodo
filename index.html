@@ -14,10 +14,9 @@
   <div class="auth-page">
     <div class="auth-container">
       <div class="auth-logo">
-        <img src="assets/dodo-logo.png" alt="The Dodos">
+        <img src="assets/dodo-logo.png" alt="CLASSQUAD">
       </div>
       <h1 class="auth-title">CLASSQUAD</h1>
-      <p class="auth-subtitle">הכיתה של אושרה ודורית</p>
 
       <div class="auth-tabs">
         <button class="auth-tab active" data-tab="login">כניסה</button>
@@ -43,8 +42,9 @@
       <form id="register-form" class="auth-form">
         <div id="register-error" class="auth-error"></div>
         <div id="register-success" class="auth-success"></div>
+
         <div class="form-group">
-          <label>כינוי (השם שיופיע באפליקציה. אפשר בעברית)</label>
+          <label>שם (יופיע באפליקציה)</label>
           <input type="text" id="reg-name" required placeholder="למשל: ליהי">
         </div>
         <div class="form-group">
@@ -59,14 +59,38 @@
           <label>אימות סיסמה</label>
           <input type="password" id="reg-password-confirm" required placeholder="הקלד שוב">
         </div>
-        <div class="checkbox-group">
-          <input type="checkbox" id="reg-admin">
-          <label for="reg-admin">אני מורה / מנהל</label>
+
+        <!-- Join / Create toggle -->
+        <div class="reg-type-toggle">
+          <button type="button" class="reg-type-btn active" data-type="join">הצטרף לכיתה</button>
+          <button type="button" class="reg-type-btn" data-type="create">צור כיתה (מורה)</button>
         </div>
-        <div class="form-group" id="admin-code-group" style="display:none">
-          <label>קוד מורה</label>
-          <input type="text" id="reg-admin-code" placeholder="הכנס את הקוד שקיבלת" autocomplete="off" autocapitalize="none">
+
+        <!-- Join existing class -->
+        <div id="panel-join" class="class-panel">
+          <div class="form-group">
+            <label>בחר כיתה</label>
+            <select id="reg-class-select" class="auth-select">
+              <option value="">...טוען כיתות</option>
+            </select>
+            <p class="no-classes-hint" id="no-classes-hint" style="display:none">
+              אין כיתות עדיין — המורה צריך להירשם קודם וליצור כיתה
+            </p>
+          </div>
         </div>
+
+        <!-- Create new class (teacher) -->
+        <div id="panel-create" class="class-panel" hidden>
+          <div class="form-group">
+            <label>שם הכיתה</label>
+            <input type="text" id="reg-class-name" placeholder="למשל: כיתה ד1">
+          </div>
+          <div class="form-group">
+            <label>קוד מורה</label>
+            <input type="text" id="reg-admin-code" placeholder="הקוד שקיבלת" autocomplete="off" autocapitalize="none">
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary">הרשמה</button>
       </form>
     </div>
