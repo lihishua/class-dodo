@@ -575,8 +575,64 @@ async function makeAnthropicCall(userContent) {
   const data = await response.json();
   const text = data.content[0].text;
   const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("לא נמצא JSON בתשובת ה-AI");
-  return JSON.parse(match[0]);
+  if (!match) throw new Error("לא נמצא JSON בתשובת ה-AI — נסה שוב");
+
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    // Response was truncated (max_tokens) or contains malformed JSON.
+    // Try to salvage complete objects from the partial text.
+    return salvageJSON(match[0], data.stop_reason);
+  }
+}
+
+// Extracts complete JSON objects from a truncated/malformed AI response.
+// Uses a string-aware state machine so { } inside quoted values don't confuse it.
+function salvageJSON(jsonStr, stopReason) {
+  const typeMatch = jsonStr.match(/"type"\s*:\s*"(math|english|events|summary)"/);
+  if (!typeMatch) throw new Error("ה-AI החזיר תשובה לא תקינה — נסה שוב");
+  const type = typeMatch[1];
+
+  if (type === "summary") throw new Error("ה-AI לא סיים לעבד את הסיכום — נסה עם קובץ קצר יותר");
+
+  const arrayKey = type === "events" ? "events" : "questions";
+  const arrayMarker = new RegExp(`"${arrayKey}"\\s*:\\s*\\[`);
+  const markerMatch = jsonStr.search(arrayMarker);
+  if (markerMatch === -1) throw new Error(`לא נמצאו ${arrayKey} בתשובת ה-AI`);
+
+  const arrayStart = jsonStr.indexOf("[", markerMatch) + 1;
+  const items = extractObjects(jsonStr.slice(arrayStart));
+
+  if (items.length === 0) throw new Error("ה-AI לא הצליח לייצר תוכן — נסה שוב");
+
+  const topicsMatch = jsonStr.match(/"topics"\s*:\s*(\[[^\]]*\])/);
+  let topics = [];
+  if (topicsMatch) try { topics = JSON.parse(topicsMatch[1]); } catch {}
+
+  if (type === "events")  return { type, events: items };
+  return { type, topics, questions: items };
+}
+
+// Walks a JSON string and extracts every complete top-level {...} object,
+// correctly skipping { } characters that appear inside string literals.
+function extractObjects(str) {
+  const items = [];
+  let depth = 0, objStart = -1, inString = false, escape = false;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (escape)            { escape = false; continue; }
+    if (ch === "\\" && inString) { escape = true;  continue; }
+    if (ch === '"')        { inString = !inString;  continue; }
+    if (inString)          continue;
+    if (ch === "{")        { if (depth++ === 0) objStart = i; }
+    else if (ch === "}") {
+      if (--depth === 0 && objStart !== -1) {
+        try { items.push(JSON.parse(str.slice(objStart, i + 1))); } catch {}
+        objStart = -1;
+      }
+    }
+  }
+  return items;
 }
 
 function updateProcessingHint(text) {
