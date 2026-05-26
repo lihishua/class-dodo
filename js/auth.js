@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// THE DODOS — Authentication
+// CLASSQUAD — Authentication
 // ═══════════════════════════════════════════════════════════════
 
 const USERNAME_DOMAIN = "@classdodo.app";

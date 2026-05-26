@@ -1,6 +1,6 @@
-# CLASS DODO
+# CLASSQUAD
 
-A Hebrew-language classroom practice web app for the students of אושרה ודורית (The Dodos). Students compete in math and English quizzes, track their scores on a live leaderboard, and stay up to date with class events and weekly summaries.
+A Hebrew-language classroom practice web app. Students compete in math and English quizzes, track their scores on a live leaderboard, and stay up to date with class events and weekly summaries.
 
 ## Features
 

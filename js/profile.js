@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// CLASS DODO — Profile Page
+// CLASSQUAD — Profile Page
 // ═══════════════════════════════════════════════════════════════
 
 document.addEventListener("DOMContentLoaded", async () => {

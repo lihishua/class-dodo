@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// THE DODOS — Firebase Configuration
+// CLASSQUAD — Firebase Configuration
 // ═══════════════════════════════════════════════════════════════
 // Fill in your Firebase project credentials below.
 // Get them from: https://console.firebase.google.com → Project Settings → Web App

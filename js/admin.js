@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// CLASS DODO — Admin Panel
+// CLASSQUAD — Admin Panel
 // ═══════════════════════════════════════════════════════════════
 
 let currentUser = null;
@@ -10,7 +10,7 @@ let selectedFile = null;
 // ─── AI Prompts ───────────────────────────────────────────────
 function buildPrompt() {
   const year = new Date().getFullYear();
-  return `You are an AI assistant for a Hebrew 4th-grade classroom app called CLASS DODO.
+  return `You are an AI assistant for a Hebrew 4th-grade classroom app called CLASSQUAD.
 
 Analyze the provided content and classify it, then generate the appropriate output.
 
