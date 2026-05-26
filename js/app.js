@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadEvents();
   loadWeeklySummary();
   loadHallOfFame();
+  setupProfileDropdown(currentProfile.displayName);
 
   document.getElementById("btn-logout").addEventListener("click", async () => {
     await auth.signOut();
@@ -107,6 +108,20 @@ async function loadHallOfFame() {
   } catch (err) {
     container.innerHTML = '<p class="hof-empty">שגיאה בטעינה</p>';
   }
+}
+
+// ─── Profile Dropdown ────────────────────────────────────────
+function setupProfileDropdown(displayName) {
+  document.getElementById("profile-dd-name").textContent = displayName;
+  const toggle = document.getElementById("btn-profile-toggle");
+  const dropdown = document.getElementById("profile-dropdown");
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  });
+
+  document.addEventListener("click", () => dropdown.classList.remove("open"));
 }
 
 // ─── Helpers ─────────────────────────────────────────────────

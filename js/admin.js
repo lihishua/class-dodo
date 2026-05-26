@@ -7,7 +7,7 @@ let currentProfile = null;
 let generatedResult = null;  // full AI result {type, questions/events/...}
 let selectedFile = null;
 
-// ─── Unified AI Prompt ────────────────────────────────────────
+// ─── AI Prompts ───────────────────────────────────────────────
 function buildPrompt() {
   const year = new Date().getFullYear();
   return `You are an AI assistant for a Hebrew 4th-grade classroom app called CLASS DODO.
@@ -15,8 +15,8 @@ function buildPrompt() {
 Analyze the provided content and classify it, then generate the appropriate output.
 
 Classification rules:
-- "math": math topics, exercises, arithmetic, exam prep → generate 25 Hebrew multiple-choice questions
-- "english": English language exercises, vocabulary, grammar → generate 25 English multiple-choice questions
+- "math": math topics, exercises, arithmetic, exam prep → generate 100 Hebrew multiple-choice questions
+- "english": English language exercises, vocabulary, grammar → generate 100 English multiple-choice questions
 - "events": dates, trips, tests, celebrations, schedule items → extract as event list
 - "summary": weekly class newsletter, general notes → format as summary
 
@@ -35,10 +35,25 @@ For summary:
 {"type":"summary","title":"...","content":"..."}
 
 Math/English rules:
-- Exactly 25 questions, 4 options each, exactly 1 correct (index 0-3)
+- Exactly 100 questions, 4 options each, exactly 1 correct (index 0-3)
 - Plausible but clearly wrong distractors
-- Varied difficulty: ~8 easy (1), ~10 medium (2), ~7 hard (3)
+- Varied difficulty: ~30 easy (1), ~40 medium (2), ~30 hard (3)
 - Brief explanations in same language as questions`;
+}
+
+function buildContinuationPrompt(type, topics) {
+  const topicList = topics.join(", ");
+  if (type === "math") {
+    return `Generate 100 more unique Hebrew 4th-grade math questions on: ${topicList}.
+Do NOT repeat any question from the previous batch. Same JSON format:
+{"type":"math","topics":["נושא"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
+Return ONLY valid JSON. Exactly 100 questions. ~30 easy (1), ~40 medium (2), ~30 hard (3).`;
+  } else {
+    return `Generate 100 more unique English questions for Israeli 4th-grade EFL students on: ${topicList}.
+Do NOT repeat any question from the previous batch. Same JSON format:
+{"type":"english","topics":["Topic"],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"Grammar"}]}
+Return ONLY valid JSON. Exactly 100 questions.`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -55,6 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupPanels();
   loadEventsPreview();
   loadHallOfFame();
+  setupProfileDropdown(currentProfile.displayName);
 
   document.getElementById("btn-logout").addEventListener("click", async () => {
     await auth.signOut();
@@ -366,6 +382,9 @@ async function handleProcess() {
 
   try {
     const result = await callAnthropicAI(fileData, textContent);
+    if (result.type === "summary" && selectedFile) {
+      result._file = selectedFile;
+    }
     generatedResult = result;
     renderPreview(result);
     showAIStep("step-preview");
@@ -403,7 +422,7 @@ function renderPreview(result) {
   const typeLabel = typeLabels[result.type] || result.type;
 
   if (result.type === "math" || result.type === "english") {
-    summaryEl.innerHTML = `<strong>זוהה:</strong> ${typeLabel} | <strong>${result.questions.length}</strong> שאלות נוצרו | נושאים: ${result.topics.join(", ")}`;
+    summaryEl.innerHTML = `<strong>זוהה:</strong> ${typeLabel} | <strong>${result.questions.length}</strong> שאלות נוצרו (מתוך 200) | נושאים: ${result.topics.join(", ")}`;
     labelEl.textContent = "3 שאלות לדוגמה:";
     const labels = result.type === "math" ? ["א", "ב", "ג", "ד"] : ["A", "B", "C", "D"];
     result.questions.slice(0, 3).forEach((q, i) => {
@@ -471,11 +490,19 @@ async function saveResult(result) {
       return `${result.events.length} אירועים נוספו ליומן!`;
     }
     case "summary": {
+      let fileUrl = null;
+      let fileName = null;
+      if (result._file) {
+        const ref = storage.ref(`summaries/${Date.now()}_${result._file.name}`);
+        await ref.put(result._file);
+        fileUrl = await ref.getDownloadURL();
+        fileName = result._file.name;
+      }
       await db.collection("summaries").add({
         title: result.title,
         content: result.content,
-        fileUrl: null,
-        fileName: null,
+        fileUrl,
+        fileName,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         createdBy: currentUser.uid,
       });
@@ -488,18 +515,42 @@ async function saveResult(result) {
 
 // ─── Anthropic API ────────────────────────────────────────────
 async function callAnthropicAI(fileData, textContent) {
-  const userContent = [];
-
-  if (fileData) {
-    if (fileData.type === "application/pdf") {
-      userContent.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: fileData.base64 } });
-    } else if (fileData.type.startsWith("image/")) {
-      userContent.push({ type: "image", source: { type: "base64", media_type: fileData.type, data: fileData.base64 } });
-    }
-  }
-  if (textContent) userContent.push({ type: "text", text: textContent });
+  const userContent = buildUserContent(fileData, textContent);
   userContent.push({ type: "text", text: buildPrompt() });
 
+  updateProcessingHint("מזהה סוג ויוצר תוכן...");
+  const result1 = await makeAnthropicCall(userContent);
+
+  if (result1.type !== "math" && result1.type !== "english") {
+    return result1;
+  }
+
+  // Second call: 100 more questions on the same topics
+  updateProcessingHint(`נושאים: ${result1.topics.join(", ")} — יוצר שאלות נוספות (101–200)...`);
+  const result2 = await makeAnthropicCall([
+    { type: "text", text: buildContinuationPrompt(result1.type, result1.topics) }
+  ]);
+
+  return {
+    ...result1,
+    questions: [...result1.questions, ...(result2.questions || [])],
+  };
+}
+
+function buildUserContent(fileData, textContent) {
+  const content = [];
+  if (fileData) {
+    if (fileData.type === "application/pdf") {
+      content.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: fileData.base64 } });
+    } else if (fileData.type.startsWith("image/")) {
+      content.push({ type: "image", source: { type: "base64", media_type: fileData.type, data: fileData.base64 } });
+    }
+  }
+  if (textContent) content.push({ type: "text", text: textContent });
+  return content;
+}
+
+async function makeAnthropicCall(userContent) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -525,6 +576,11 @@ async function callAnthropicAI(fileData, textContent) {
   const match = text.match(/\{[\s\S]*\}/);
   if (!match) throw new Error("לא נמצא JSON בתשובת ה-AI");
   return JSON.parse(match[0]);
+}
+
+function updateProcessingHint(text) {
+  const el = document.getElementById("processing-hint");
+  if (el) el.textContent = text;
 }
 
 function fileToBase64(file) {
@@ -584,6 +640,20 @@ async function resetLeaderboard(type) {
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   return d.toLocaleDateString("he-IL", { day: "numeric", month: "numeric" });
+}
+
+// ─── Profile Dropdown ────────────────────────────────────────
+function setupProfileDropdown(displayName) {
+  document.getElementById("profile-dd-name").textContent = displayName;
+  const toggle = document.getElementById("btn-profile-toggle");
+  const dropdown = document.getElementById("profile-dropdown");
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle("open");
+  });
+
+  document.addEventListener("click", () => dropdown.classList.remove("open"));
 }
 
 function showToast(msg) {

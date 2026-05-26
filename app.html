@@ -17,8 +17,16 @@
     <!-- RTL: first child → right, last child → left -->
     <header class="top-bar">
       <div class="top-end">
-        <img src="assets/account.png" alt="התנתק" class="account-icon" id="btn-logout" title="התנתק">
+        <div class="profile-wrap" id="profile-wrap">
+          <img src="assets/account.png" alt="פרופיל" class="account-icon" id="btn-profile-toggle">
+          <div class="profile-dropdown" id="profile-dropdown">
+            <div class="profile-dd-name" id="profile-dd-name"></div>
+            <a href="profile.html" class="profile-dd-item">👤 הפרופיל שלי</a>
+            <button class="profile-dd-item profile-dd-logout" id="btn-logout">🚪 התנתקות</button>
+          </div>
+        </div>
         <img src="assets/header2 section.png" alt="הכיתה של אושרה ודורית" class="class-badge-img">
+        <img src="assets/alarm-clock.png" alt="שעון" class="topbar-clock">
       </div>
       <div class="logo-pill">CLASS DODO</div>
     </header>

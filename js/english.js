@@ -160,11 +160,26 @@ async function handleAnswer(idx) {
   document.getElementById("btn-next-q").style.display = "block";
 
   try {
-    await db.collection("users").doc(currentUser.uid).update({
+    const batch = db.batch();
+    const userRef = db.collection("users").doc(currentUser.uid);
+    batch.update(userRef, {
       englishCorrect: firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0),
       englishTotal: firebase.firestore.FieldValue.increment(1),
       seenEnglishQuestions: seenIds,
     });
+    const answerRef = userRef.collection("answers").doc();
+    batch.set(answerRef, {
+      subject: "english",
+      questionId: q.id,
+      question: q.question,
+      options: q.options,
+      userAnswer: idx,
+      correct: q.correct,
+      isCorrect,
+      explanation: q.explanation || "",
+      answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
   } catch (err) {
     console.error("Save error:", err);
   }

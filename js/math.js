@@ -184,11 +184,26 @@ async function handleAnswer(idx) {
 
   // Save to Firestore
   try {
-    await db.collection("users").doc(currentUser.uid).update({
+    const batch = db.batch();
+    const userRef = db.collection("users").doc(currentUser.uid);
+    batch.update(userRef, {
       mathCorrect: firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0),
       mathTotal: firebase.firestore.FieldValue.increment(1),
       seenMathQuestions: seenIds,
     });
+    const answerRef = userRef.collection("answers").doc();
+    batch.set(answerRef, {
+      subject: "math",
+      questionId: q.id,
+      question: q.question,
+      options: q.options,
+      userAnswer: idx,
+      correct: q.correct,
+      isCorrect,
+      explanation: q.explanation || "",
+      answeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
   } catch (err) {
     console.error("Save error:", err);
   }

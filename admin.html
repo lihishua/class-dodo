@@ -16,9 +16,19 @@
     <!-- ── Top Bar ── -->
     <header class="top-bar">
       <div class="top-end">
-        <img src="assets/account.png" alt="התנתק" class="account-icon" id="btn-logout" title="התנתק">
+        <div class="profile-wrap" id="profile-wrap">
+          <img src="assets/account.png" alt="פרופיל" class="account-icon" id="btn-profile-toggle">
+          <div class="profile-dropdown" id="profile-dropdown">
+            <div class="profile-dd-name" id="profile-dd-name"></div>
+            <a href="profile.html" class="profile-dd-item">👤 הפרופיל שלי</a>
+            <button class="profile-dd-item profile-dd-logout" id="btn-logout">🚪 התנתקות</button>
+          </div>
+        </div>
         <img src="assets/header2 section.png" alt="הכיתה של אושרה ודורית" class="class-badge-img">
-        <button class="btn-upload-pill" id="btn-upload">📤 הוספת חומר</button>
+        <img src="assets/alarm-clock.png" alt="שעון" class="topbar-clock">
+        <button class="btn-upload-pill" id="btn-upload">
+          <img src="assets/upload button.png" alt="הוספת חומר" class="upload-btn-img">
+        </button>
       </div>
       <div class="logo-pill">CLASS DODO <span class="logo-admin-tag">– ADMIN</span></div>
     </header>
@@ -49,12 +59,12 @@
         </div>
 
         <div class="hof-card">
-          <div id="hof-list" class="hof-list">
-            <p class="hof-empty">...טוען</p>
-          </div>
           <button class="btn-reset-hof" id="btn-reset-lb">
             <img src="assets/reset podium button.png" alt="איפוס רשימה" class="reset-btn-img">
           </button>
+          <div id="hof-list" class="hof-list">
+            <p class="hof-empty">...טוען</p>
+          </div>
         </div>
       </div>
 
