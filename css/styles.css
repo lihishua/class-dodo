@@ -318,13 +318,6 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.5px;
 }
 
-.topbar-clock {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
 
 .logo-text {
   font-family: 'Barriecito', cursive;
