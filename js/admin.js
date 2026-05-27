@@ -211,22 +211,23 @@ async function loadEvents() {
 // ─── Events Preview (main card) ───────────────────────────────
 async function loadEventsPreview() {
   const container = document.getElementById("events-preview");
+  if (!container) return;
   try {
-    const snap = await db.collection("events")
-      .orderBy("date", "asc")
-      .get();
+    const snap = await db.collection("events").get();
     if (snap.empty) { container.innerHTML = '<p class="empty-state">אין אירועים עדיין</p>'; return; }
+    const events = [];
+    snap.forEach(doc => events.push(doc.data()));
+    events.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
     container.innerHTML = "";
-    snap.forEach(doc => {
-      const ev = doc.data();
+    events.forEach(ev => {
       const div = document.createElement("div");
       div.className = "event-item";
       div.innerHTML = `<span class="event-date">${formatDate(ev.date)}</span><span class="event-text">${ev.title}</span>`;
       container.appendChild(div);
     });
   } catch (err) {
-    console.error("loadEventsPreview error:", err);
-    container.innerHTML = '<p class="empty-state">שגיאה בטעינת אירועים</p>';
+    console.error("loadEventsPreview:", err);
+    container.innerHTML = `<p class="empty-state">שגיאה: ${err.message}</p>`;
   }
 }
 

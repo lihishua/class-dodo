@@ -633,7 +633,8 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
 }
 
-#events-list {
+#events-list,
+#events-preview {
   flex: 1;
   overflow-y: auto;
 }
@@ -1217,8 +1218,8 @@ a { color: inherit; text-decoration: none; }
 
 /* Events card header image */
 .events-header-img {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 54px;
   display: block;
 }
 
