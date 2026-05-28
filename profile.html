@@ -23,6 +23,22 @@
       <p class="profile-loading">...טוען היסטוריה</p>
     </div>
 
+    <div class="profile-footer">
+      <button class="btn-delete-account" id="btn-delete-account">🗑️ מחיקת חשבון</button>
+    </div>
+
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div class="modal-overlay" id="modal-delete" hidden>
+    <div class="delete-modal">
+      <p class="delete-modal-title">למחוק את החשבון?</p>
+      <p class="delete-modal-body">הפעולה תמחק את כל הנתונים שלך לצמיתות ולא ניתן לבטלה.</p>
+      <div class="delete-modal-actions">
+        <button class="btn-confirm-delete" id="btn-confirm-delete">כן, מחק</button>
+        <button class="btn-cancel-delete" id="btn-cancel-delete">ביטול</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>

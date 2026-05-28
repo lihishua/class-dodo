@@ -13,6 +13,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = profile.role === "admin" ? "admin.html" : "app.html";
   });
 
+  document.getElementById("btn-delete-account").addEventListener("click", () => {
+    document.getElementById("modal-delete").hidden = false;
+  });
+  document.getElementById("btn-cancel-delete").addEventListener("click", () => {
+    document.getElementById("modal-delete").hidden = true;
+  });
+  document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
+    const btn = document.getElementById("btn-confirm-delete");
+    btn.disabled = true;
+    btn.textContent = "...מוחק";
+    try {
+      const answersSnap = await db.collection("users").doc(user.uid).collection("answers").get();
+      const batch = db.batch();
+      answersSnap.forEach(doc => batch.delete(doc.ref));
+      batch.delete(db.collection("users").doc(user.uid));
+      await batch.commit();
+      await user.delete();
+      window.location.href = "index.html";
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "כן, מחק";
+      document.getElementById("modal-delete").hidden = true;
+      alert("שגיאה במחיקת החשבון: " + err.message);
+    }
+  });
+
   const mathCorrect  = profile.mathCorrect    || 0;
   const mathTotal    = profile.mathTotal      || 0;
   const engCorrect   = profile.englishCorrect || 0;
