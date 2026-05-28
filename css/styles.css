@@ -330,7 +330,7 @@ a { color: inherit; text-decoration: none; }
   height: 100vh;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 24% 24% 44%;
+  grid-template-columns: 24% 18% 50%;
   grid-template-rows: 12% auto;
   gap: 3%;
   padding: 4%;
@@ -1769,10 +1769,9 @@ a { color: inherit; text-decoration: none; }
   .top-bar      { flex-shrink: 0; direction: rtl; order: 0; }
   .events-card  { order: 1; flex: none; min-height: 160px; padding: 16px 20px; }
   .math-card    { order: 2; flex: none; height: 180px; }
-  .hebrew-card  { order: 3; flex: none; height: 130px; }
-  .english-card { order: 4; flex: none; height: 130px; }
-  .hof-card     { order: 5; flex: none; height: 160px; }
-  .folder-card  { order: 6; flex: none; height: 110px; }
+  .english-card { order: 3; flex: none; height: 130px; }
+  .hof-card     { order: 4; flex: none; height: 160px; }
+  .folder-card  { order: 5; flex: none; height: 110px; }
   .admin-link { order: 6; grid-column: unset; grid-row: unset; }
 
   .dodo-card { display: none; }
