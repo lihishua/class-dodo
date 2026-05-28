@@ -10,6 +10,7 @@ let sessionCorrect = 0;
 let sessionTotal = 0;
 let allQuestions = [];
 let seenIds = [];
+let currentLevel = 1;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await requireAuth();
@@ -17,8 +18,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = result.user;
   currentProfile = result.profile;
   seenIds = currentProfile.seenEnglishQuestions || [];
+  currentLevel = currentProfile.englishLevel || 1;
 
   document.getElementById("player-name").textContent = currentProfile.displayName;
+  renderLevelBadge();
 
   await loadQuestions();
   await loadLeaderboard();
@@ -95,17 +98,54 @@ function startPractice() {
 }
 
 function nextQuestion() {
-  const unseen = allQuestions.filter(q => !seenIds.includes(q.id));
-  const pool = unseen.length > 0 ? unseen : allQuestions;
+  const levelQs = allQuestions.filter(q => (q.difficulty || 1) === currentLevel);
+  const pool = levelQs.length > 0 ? levelQs : allQuestions;
+  const unseen = pool.filter(q => !seenIds.includes(q.id));
 
-  if (pool.length === 0) {
-    showFinished();
+  if (unseen.length === 0) {
+    if (pool === levelQs && currentLevel < 3) {
+      handleLevelUp();
+    } else {
+      showFinished();
+    }
     return;
   }
 
-  currentQuestion = pool[Math.floor(Math.random() * pool.length)];
+  currentQuestion = unseen[Math.floor(Math.random() * unseen.length)];
   questionStartTime = Date.now();
   renderQuestion();
+}
+
+async function handleLevelUp() {
+  const newLevel = currentLevel + 1;
+  currentLevel = newLevel;
+  currentProfile.englishLevel = newLevel;
+  try {
+    await db.collection("users").doc(currentUser.uid).update({ englishLevel: newLevel });
+  } catch (e) { console.error(e); }
+
+  for (let i = 0; i < 4; i++) setTimeout(fireConfetti, i * 250);
+  renderLevelBadge();
+
+  const stars = ["⭐", "⭐⭐", "⭐⭐⭐"];
+  document.getElementById("question-area").innerHTML = `
+    <div class="finished-msg">
+      <div class="finished-emoji">🌟</div>
+      <h2>Level Up!</h2>
+      <p>${stars[newLevel - 1]}</p>
+      <p>Amazing! You're now on level ${newLevel} of 3</p>
+      <button class="btn-start btn-next-level" id="btn-continue-level">Continue to level ${newLevel} ▶</button>
+    </div>`;
+  document.getElementById("btn-continue-level").addEventListener("click", () => {
+    renderQuestion();
+    nextQuestion();
+  });
+  document.getElementById("btn-next-q").style.display = "none";
+}
+
+function renderLevelBadge() {
+  const el = document.getElementById("level-badge");
+  if (el) el.textContent = `Level ${currentLevel}`;
 }
 
 function renderQuestion() {
@@ -166,6 +206,7 @@ async function handleAnswer(idx) {
       englishCorrect: firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0),
       englishTotal: firebase.firestore.FieldValue.increment(1),
       seenEnglishQuestions: seenIds,
+      englishLevel: currentLevel,
     });
     const answerRef = userRef.collection("answers").doc();
     batch.set(answerRef, {

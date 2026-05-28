@@ -12,8 +12,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = result.user;
   currentProfile = result.profile;
 
-  loadEvents();
-  loadWeeklySummary();
+  let vacationMode = false;
+  if (currentProfile.classId) {
+    const classSnap = await db.collection("classes").doc(currentProfile.classId).get();
+    if (classSnap.exists && classSnap.data().vacationMode) vacationMode = true;
+  }
+
+  if (vacationMode) {
+    applyVacationMode();
+  } else {
+    loadEvents();
+    loadWeeklySummary();
+  }
+
   loadHallOfFame();
   setupProfileDropdown(currentProfile.displayName);
 
@@ -22,6 +33,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "index.html";
   });
 });
+
+// ─── Vacation Mode ───────────────────────────────────────────
+function applyVacationMode() {
+  const eventsCard = document.querySelector(".events-card");
+  const folderCard = document.querySelector(".folder-card");
+  if (eventsCard) {
+    eventsCard.innerHTML = `
+      <div class="vacation-msg">
+        <div class="vacation-icon">🏖️</div>
+        <p class="vacation-text">הכיתה בחופשה</p>
+        <p class="vacation-sub">לוח שנה וסיכומים לא זמינים כרגע</p>
+      </div>`;
+  }
+  if (folderCard) folderCard.style.visibility = "hidden";
+}
 
 // ─── Load Events ─────────────────────────────────────────────
 async function loadEvents() {

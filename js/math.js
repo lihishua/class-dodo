@@ -10,6 +10,7 @@ let sessionCorrect = 0;
 let sessionTotal = 0;
 let allQuestions = [];
 let seenIds = [];
+let currentLevel = 1;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const result = await requireAuth();
@@ -17,8 +18,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   currentUser = result.user;
   currentProfile = result.profile;
   seenIds = currentProfile.seenMathQuestions || [];
+  currentLevel = currentProfile.mathLevel || 1;
 
   document.getElementById("player-name").textContent = currentProfile.displayName;
+  renderLevelBadge();
 
   // Load questions from Firestore
   await loadQuestions();
@@ -102,20 +105,55 @@ function startPractice() {
 
 // ─── Get Next Question ──────────────────────────────────────
 function nextQuestion() {
-  // Filter out seen questions
-  const unseen = allQuestions.filter(q => !seenIds.includes(q.id));
-  const pool = unseen.length > 0 ? unseen : allQuestions; // if all seen, allow repeats
+  const levelQs = allQuestions.filter(q => (q.difficulty || 1) === currentLevel);
+  const pool = levelQs.length > 0 ? levelQs : allQuestions; // fallback if no questions at this level
+  const unseen = pool.filter(q => !seenIds.includes(q.id));
 
-  if (pool.length === 0) {
-    showFinished();
+  if (unseen.length === 0) {
+    if (pool === levelQs && currentLevel < 3) {
+      handleLevelUp();
+    } else {
+      showFinished();
+    }
     return;
   }
 
-  // Pick random
-  currentQuestion = pool[Math.floor(Math.random() * pool.length)];
+  currentQuestion = unseen[Math.floor(Math.random() * unseen.length)];
   questionStartTime = Date.now();
-
   renderQuestion();
+}
+
+// ─── Level Up ───────────────────────────────────────────────
+async function handleLevelUp() {
+  const newLevel = currentLevel + 1;
+  currentLevel = newLevel;
+  currentProfile.mathLevel = newLevel;
+  try {
+    await db.collection("users").doc(currentUser.uid).update({ mathLevel: newLevel });
+  } catch (e) { console.error(e); }
+
+  for (let i = 0; i < 4; i++) setTimeout(fireConfetti, i * 250);
+  renderLevelBadge();
+
+  const stars = ["⭐", "⭐⭐", "⭐⭐⭐"];
+  document.getElementById("question-area").innerHTML = `
+    <div class="finished-msg">
+      <div class="finished-emoji">🌟</div>
+      <h2>!עלית רמה</h2>
+      <p>${stars[newLevel - 1]}</p>
+      <p>כל הכבוד! אתה עכשיו ברמה ${newLevel} מתוך 3</p>
+      <button class="btn-start btn-next-level" id="btn-continue-level">המשך לרמה ${newLevel} ▶</button>
+    </div>`;
+  document.getElementById("btn-continue-level").addEventListener("click", () => {
+    renderQuestion();
+    nextQuestion();
+  });
+  document.getElementById("btn-next-q").style.display = "none";
+}
+
+function renderLevelBadge() {
+  const el = document.getElementById("level-badge");
+  if (el) el.textContent = `רמה ${currentLevel}`;
 }
 
 // ─── Render Question ────────────────────────────────────────
@@ -190,6 +228,7 @@ async function handleAnswer(idx) {
       mathCorrect: firebase.firestore.FieldValue.increment(isCorrect ? 1 : 0),
       mathTotal: firebase.firestore.FieldValue.increment(1),
       seenMathQuestions: seenIds,
+      mathLevel: currentLevel,
     });
     const answerRef = userRef.collection("answers").doc();
     batch.set(answerRef, {
