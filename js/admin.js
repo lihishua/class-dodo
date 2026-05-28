@@ -32,6 +32,10 @@ ENGLISH (vocabulary lists, grammar exercises, reading comprehension):
 {"type":"english","topics":["topic1","topic2"]}
 List the specific English topics — do NOT generate questions yet.
 
+HEBREW (עברית — grammar, spelling, vocabulary, reading comprehension in Hebrew):
+{"type":"hebrew","topics":["topic1","topic2"]}
+List the specific Hebrew topics — do NOT generate questions yet.
+
 Return ONLY valid JSON. No explanation, no markdown.`;
 }
 
@@ -45,10 +49,16 @@ ${noRepeat}Return ONLY valid JSON:
 {"type":"math","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
 Exactly 100 questions. ~30 easy (1), ~40 medium (2), ~30 hard (3). Plausible but clearly wrong distractors.`;
   }
-  return `Generate 100 unique English questions for Israeli 4th-grade EFL students on: ${topicList}.
+  if (type === "english") {
+    return `Generate 100 unique English questions for Israeli 4th-grade EFL students on: ${topicList}.
 ${noRepeat}Return ONLY valid JSON:
-{"type":"english","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"..."}]}
-Exactly 100 questions.`;
+{"type":"english","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","topic":"...","difficulty":2}]}
+Exactly 100 questions. ~30 easy (1), ~40 medium (2), ~30 hard (3).`;
+  }
+  return `צור 100 שאלות עברית ייחודיות לכיתה ד בנושאים: ${topicList}.
+${noRepeat}החזר JSON תקין בלבד:
+{"type":"hebrew","topics":[...],"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"...","difficulty":2}]}
+בדיוק 100 שאלות. ~30 קלות (1), ~40 בינוניות (2), ~30 קשות (3). הכל בעברית.`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -75,9 +85,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-upload").addEventListener("click", openAIModal);
 
   document.getElementById("btn-reset-lb").addEventListener("click", async () => {
-    if (!confirm("לאפס את כל הלידרבורדים? (חשבון ואנגלית יחד)")) return;
+    if (!confirm("לאפס את כל הלידרבורדים? (חשבון, אנגלית ועברית יחד)")) return;
     await resetLeaderboard("math");
     await resetLeaderboard("english");
+    await resetLeaderboard("hebrew");
     showToast("!כל הלידרבורדים אופסו");
     loadHallOfFame();
   });
@@ -240,7 +251,7 @@ async function loadHallOfFame() {
     const users = [];
     snap.forEach(doc => {
       const u = doc.data();
-      const score = (u.mathCorrect || 0) + (u.englishCorrect || 0);
+      const score = (u.mathCorrect || 0) + (u.englishCorrect || 0) + (u.hebrewCorrect || 0);
       if (score > 0) users.push({ name: u.displayName, score });
     });
     users.sort((a, b) => b.score - a.score);
@@ -412,7 +423,7 @@ function renderPreview(result) {
   const container = document.getElementById("preview-questions");
   container.innerHTML = "";
 
-  const typeLabels = { math: "שאלות חשבון", english: "שאלות אנגלית", events: "אירועים", summary: "סיכום שבועי" };
+  const typeLabels = { math: "שאלות חשבון", english: "שאלות אנגלית", hebrew: "שאלות עברית", events: "אירועים", summary: "סיכום שבועי" };
   const typeLabel = typeLabels[result.type] || result.type;
 
   if (result.type === "math" || result.type === "english") {
@@ -458,8 +469,11 @@ function renderPreview(result) {
 async function saveResult(result) {
   switch (result.type) {
     case "math":
-    case "english": {
-      const col = result.type === "math" ? "mathQuestions" : "englishQuestions";
+    case "english":
+    case "hebrew": {
+      const colMap = { math: "mathQuestions", english: "englishQuestions", hebrew: "hebrewQuestions" };
+      const labelMap = { math: "חשבון", english: "אנגלית", hebrew: "עברית" };
+      const col = colMap[result.type];
       const batch = db.batch();
       result.questions.forEach(q => {
         batch.set(db.collection(col).doc(), {
@@ -469,7 +483,7 @@ async function saveResult(result) {
         });
       });
       await batch.commit();
-      return `${result.questions.length} שאלות ${result.type === "math" ? "חשבון" : "אנגלית"} נשמרו!`;
+      return `${result.questions.length} שאלות ${labelMap[result.type]} נשמרו!`;
     }
     case "events": {
       const batch = db.batch();
@@ -524,9 +538,10 @@ async function callAnthropicAI(fileData, textContent) {
   }
 
   const { type, topics } = classified;
+  const typeLabel = type === "math" ? "חשבון" : type === "hebrew" ? "עברית" : "אנגלית";
 
   // Step 2: first 100 questions
-  updateProcessingHint(`זוהה: ${type === "math" ? "חשבון" : "אנגלית"} | נושאים: ${topics.join(", ")} — יוצר שאלות 1–100...`);
+  updateProcessingHint(`זוהה: ${typeLabel} | נושאים: ${topics.join(", ")} — יוצר שאלות 1–100...`);
   const q1 = await makeAnthropicCall(
     [{ type: "text", text: buildQuestionsPrompt(type, topics, 1) }],
     8192
@@ -694,8 +709,10 @@ async function resetLeaderboard(type) {
   snap.forEach(doc => {
     if (type === "math") {
       batch.update(doc.ref, { mathCorrect: 0, mathTotal: 0, seenMathQuestions: [] });
-    } else {
+    } else if (type === "english") {
       batch.update(doc.ref, { englishCorrect: 0, englishTotal: 0, seenEnglishQuestions: [] });
+    } else {
+      batch.update(doc.ref, { hebrewCorrect: 0, hebrewTotal: 0, seenHebrewQuestions: [] });
     }
   });
   await batch.commit();

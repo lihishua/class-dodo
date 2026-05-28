@@ -112,7 +112,7 @@ async function loadHallOfFame() {
     const users = [];
     snap.forEach(doc => {
       const u = doc.data();
-      const score = (u.mathCorrect || 0) + (u.englishCorrect || 0);
+      const score = (u.mathCorrect || 0) + (u.englishCorrect || 0) + (u.hebrewCorrect || 0);
       if (score > 0) users.push({ name: u.displayName, score });
     });
 

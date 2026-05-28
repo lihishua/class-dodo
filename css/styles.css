@@ -330,7 +330,7 @@ a { color: inherit; text-decoration: none; }
   height: 100vh;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 24% 18% 50%;
+  grid-template-columns: 24% 24% 44%;
   grid-template-rows: 12% auto;
   gap: 3%;
   padding: 4%;
@@ -500,6 +500,53 @@ a { color: inherit; text-decoration: none; }
 
 .math-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
 .math-card:active { transform: scale(0.98); }
+
+/* ── Hebrew Card ── */
+.hebrew-card {
+  flex: 2;
+  min-height: 0;
+  background-color: #1A5276;
+  background-image: url('../assets/hebrew section.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+
+.hebrew-card::before {
+  content: 'עב';
+  position: absolute;
+  font-family: 'Motek', 'Rubik', sans-serif;
+  font-size: 90px;
+  font-weight: 900;
+  color: rgba(255,255,255,0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hebrew-card::after {
+  content: 'עברית';
+  font-family: 'Motek', 'Rubik', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.92);
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  position: relative;
+  z-index: 1;
+}
+
+.hebrew-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.hebrew-card:active { transform: scale(0.98); }
 
 .math-icon-wrap {
   width: 90px;
@@ -724,6 +771,10 @@ a { color: inherit; text-decoration: none; }
   min-height: 100dvh;
   background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
   padding: 20px 16px;
+}
+
+.quiz-page-hebrew {
+  background: linear-gradient(135deg, #1A5276 0%, #0D3B5E 100%);
 }
 
 .quiz-container {
@@ -1718,9 +1769,10 @@ a { color: inherit; text-decoration: none; }
   .top-bar      { flex-shrink: 0; direction: rtl; order: 0; }
   .events-card  { order: 1; flex: none; min-height: 160px; padding: 16px 20px; }
   .math-card    { order: 2; flex: none; height: 180px; }
-  .english-card { order: 3; flex: none; height: 130px; }
-  .hof-card     { order: 4; flex: none; height: 160px; }
-  .folder-card  { order: 5; flex: none; height: 110px; }
+  .hebrew-card  { order: 3; flex: none; height: 130px; }
+  .english-card { order: 4; flex: none; height: 130px; }
+  .hof-card     { order: 5; flex: none; height: 160px; }
+  .folder-card  { order: 6; flex: none; height: 110px; }
   .admin-link { order: 6; grid-column: unset; grid-row: unset; }
 
   .dodo-card { display: none; }
