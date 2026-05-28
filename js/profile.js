@@ -13,28 +13,65 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = profile.role === "admin" ? "admin.html" : "app.html";
   });
 
-  document.getElementById("btn-delete-account").addEventListener("click", () => {
+  document.getElementById("btn-delete-account").addEventListener("click", async () => {
+    if (profile.role === "admin" && profile.classId) {
+      const studentsSnap = await db.collection("users")
+        .where("classId", "==", profile.classId)
+        .where("role", "==", "student")
+        .get();
+      if (!studentsSnap.empty) {
+        document.getElementById("delete-teacher-name").textContent = profile.displayName;
+        document.getElementById("modal-delete-teacher").hidden = false;
+        return;
+      }
+    }
     document.getElementById("modal-delete").hidden = false;
   });
+
+  // Student simple modal
   document.getElementById("btn-cancel-delete").addEventListener("click", () => {
     document.getElementById("modal-delete").hidden = true;
   });
   document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
     const btn = document.getElementById("btn-confirm-delete");
-    btn.disabled = true;
-    btn.textContent = "...מוחק";
+    btn.disabled = true; btn.textContent = "...מוחק";
     try {
-      const answersSnap = await db.collection("users").doc(user.uid).collection("answers").get();
-      const batch = db.batch();
-      answersSnap.forEach(doc => batch.delete(doc.ref));
-      batch.delete(db.collection("users").doc(user.uid));
-      await batch.commit();
-      await user.delete();
-      window.location.href = "index.html";
+      await deleteAccount({ user, profile });
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "כן, מחק";
+      document.getElementById("modal-delete").hidden = true;
+      alert("שגיאה במחיקת החשבון: " + err.message);
+    }
+  });
+
+  // Teacher modal
+  document.getElementById("btn-cancel-delete-teacher").addEventListener("click", () => {
+    document.getElementById("modal-delete-teacher").hidden = true;
+  });
+  document.getElementById("btn-delete-class").addEventListener("click", async () => {
+    const btn = document.getElementById("btn-delete-class");
+    btn.disabled = true;
+    try {
+      await db.collection("classes").doc(profile.classId).delete();
+      await deleteAccount({ user, profile });
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = "כן, מחק";
-      document.getElementById("modal-delete").hidden = true;
+      document.getElementById("modal-delete-teacher").hidden = true;
+      alert("שגיאה במחיקת החשבון: " + err.message);
+    }
+  });
+  document.getElementById("btn-vacation-mode").addEventListener("click", async () => {
+    const btn = document.getElementById("btn-vacation-mode");
+    btn.disabled = true;
+    try {
+      await db.collection("classes").doc(profile.classId).update({
+        vacationMode: true,
+        teacherDeletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      await deleteAccount({ user, profile });
+    } catch (err) {
+      btn.disabled = false;
+      document.getElementById("modal-delete-teacher").hidden = true;
       alert("שגיאה במחיקת החשבון: " + err.message);
     }
   });
@@ -49,6 +86,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadHistory(user.uid);
 });
+
+async function deleteAccount({ user, profile }) {
+  const answersSnap = await db.collection("users").doc(user.uid).collection("answers").get();
+  const batch = db.batch();
+  answersSnap.forEach(doc => batch.delete(doc.ref));
+  batch.delete(db.collection("users").doc(user.uid));
+  await batch.commit();
+  await user.delete();
+  window.location.href = "index.html";
+}
 
 async function loadHistory(uid) {
   const container = document.getElementById("profile-content");

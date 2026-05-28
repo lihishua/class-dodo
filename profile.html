@@ -29,7 +29,7 @@
 
   </div>
 
-  <!-- Delete confirmation modal -->
+  <!-- Student delete confirmation modal -->
   <div class="modal-overlay" id="modal-delete" hidden>
     <div class="delete-modal">
       <p class="delete-modal-title">למחוק את החשבון?</p>
@@ -38,6 +38,26 @@
         <button class="btn-confirm-delete" id="btn-confirm-delete">כן, מחק</button>
         <button class="btn-cancel-delete" id="btn-cancel-delete">ביטול</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Teacher delete modal (shown when class has students) -->
+  <div class="modal-overlay" id="modal-delete-teacher" hidden>
+    <div class="delete-modal delete-modal-teacher">
+      <p class="delete-modal-title">היי <span id="delete-teacher-name"></span> 👋</p>
+      <p class="delete-modal-body">יש תלמידים בכיתה שלך. האם אתה בטוח שברצונך למחוק את החשבון?</p>
+      <p class="delete-modal-body">מה לעשות עם הכיתה?</p>
+      <div class="delete-teacher-options">
+        <button class="btn-delete-class" id="btn-delete-class">
+          <span class="delete-opt-title">🗑️ מחק את הכיתה</span>
+          <span class="delete-opt-desc">הכיתה והתלמידים יישארו ללא קבוצה</span>
+        </button>
+        <button class="btn-vacation-mode" id="btn-vacation-mode">
+          <span class="delete-opt-title">🏖️ מצב חופשה</span>
+          <span class="delete-opt-desc">הכיתה נשארת עד שמורה חדשה תיכנס כמנהל</span>
+        </button>
+      </div>
+      <button class="btn-cancel-delete" id="btn-cancel-delete-teacher">ביטול</button>
     </div>
   </div>
 
