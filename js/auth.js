@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showError("register", "שם משתמש יכול להכיל רק אותיות באנגלית, מספרים ו- . _ -");
       return;
     }
-    if (password.length < 4) { showError("register", "הסיסמה חייבת להכיל לפחות 4 תווים"); return; }
+    if (password.length < 6) { showError("register", "הסיסמה חייבת להכיל לפחות 6 תווים"); return; }
     if (password !== passwordConfirm) { showError("register", "הסיסמאות לא תואמות"); return; }
 
     let classId   = null;
@@ -168,7 +168,7 @@ function translateError(code) {
     "auth/invalid-email":        "שם משתמש לא תקין",
     "auth/user-not-found":       "שם המשתמש לא נמצא",
     "auth/wrong-password":       "סיסמה שגויה",
-    "auth/weak-password":        "הסיסמה חלשה מדי (לפחות 4 תווים)",
+    "auth/weak-password":        "הסיסמה חלשה מדי (לפחות 6 תווים)",
     "auth/too-many-requests":    "יותר מדי ניסיונות, נסה שוב מאוחר יותר",
     "auth/invalid-credential":   "שם משתמש או סיסמה שגויים",
   };
